@@ -29,7 +29,7 @@ program
         };
         request(options, (err, res, body) => {
             if (program.json) {
-                console.log(JSON.stringify(err || boy));
+                console.log(JSON.stringify(err || body));
             } else {
                 if (err) throw err;
                 console.log(body);
