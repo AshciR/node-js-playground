@@ -2,6 +2,7 @@
 
 const program = require('commander');
 const pkg = require('./package.json');
+const request = require('request');
 
 program
     .version(pkg.version)
@@ -12,17 +13,35 @@ program
     .option('-j, --json', 'format output as JSON')
     .option('-i, --index <name>', 'which index to use')
     .option('-t, --type <type>', 'default type for bulk operations');
-    
+
 program
     .command('url [path]')
     .description('generate the URL for the options and path (default is /)')
     .action((path = '/') => console.log(fullUrl(path)));
 
+program
+    .command('get [path]')
+    .description('perform an HTTP GET request for path (default is /)')
+    .action((path = '/') => {
+        const options = {
+            url: fullUrl(path),
+            json: program.json,
+        };
+        request(options, (err, res, body) => {
+            if (program.json) {
+                console.log(JSON.stringify(err || boy));
+            } else {
+                if (err) throw err;
+                console.log(body);
+            }
+        });
+    });
+
 const fullUrl = (path = '') => {
     let url = `http://${program.host}:${program.port}/`;
-    if (program.index){
+    if (program.index) {
         url += program.index + '/';
-        if(program.type){
+        if (program.type) {
             url += program.type + '/';
         }
     }
@@ -32,14 +51,6 @@ const fullUrl = (path = '') => {
 program.parse(process.argv);
 
 // If there are no arguments then display the help message
-if (!program.args.filter(arg => typeof arg === 'object').length){
+if (!program.args.filter(arg => typeof arg === 'object').length) {
     program.help();
 }
-
-
-
-
-    
-
-
-
